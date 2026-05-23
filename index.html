@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Gokulakrishnan R — EWM Consultant</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --bg: #0a0e1a;
+    --surface: #111827;
+    --surface2: #1a2236;
+    --accent: #00d4ff;
+    --accent2: #7c3aed;
+    --accent3: #f59e0b;
+    --text: #e2e8f0;
+    --text-muted: #94a3b8;
+    --border: rgba(255,255,255,0.07);
+    --glow: 0 0 40px rgba(0,212,255,0.15);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    overflow-x: hidden;
+    cursor: none;
+  }
+
+  /* Custom cursor */
+  .cursor {
+    position: fixed; width: 12px; height: 12px;
+    background: var(--accent); border-radius: 50%;
+    pointer-events: none; z-index: 9999;
+    transform: translate(-50%, -50%);
+    transition: transform 0.1s, width 0.2s, height 0.2s, background 0.2s;
+    mix-blend-mode: screen;
+  }
+  .cursor-ring {
+    position: fixed; width: 40px; height: 40px;
+    border: 1px solid rgba(0,212,255,0.4); border-radius: 50%;
+    pointer-events: none; z-index: 9998;
+    transform: translate(-50%, -50%);
+    transition: transform 0.15s ease, width 0.3s, height 0.3s, border-color 0.3s;
+  }
+
+  /* Noise overlay */
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none; z-index: 1000; opacity: 0.4;
+  }
+
+  /* Animated grid background */
+  .grid-bg {
+    position: fixed; inset: 0; z-index: 0;
+    background-image:
+      linear-gradient(rgba(0,212,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,212,255,0.03) 1px, transparent 1px);
+    background-size: 60px 60px;
+    animation: gridMove 20s linear infinite;
+  }
+  @keyframes gridMove {
+    0% { background-position: 0 0; }
+    100% { background-position: 60px 60px; }
+  }
+
+  /* Orbs */
+  .orb {
+    position: fixed; border-radius: 50%; filter: blur(80px);
+    pointer-events: none; z-index: 0;
+    animation: orbFloat 8s ease-in-out infinite;
+  }
+  .orb1 { width: 500px; height: 500px; background: rgba(0,212,255,0.06); top: -150px; right: -100px; }
+  .orb2 { width: 400px; height: 400px; background: rgba(124,58,237,0.08); bottom: 10%; left: -100px; animation-delay: -4s; }
+  .orb3 { width: 300px; height: 300px; background: rgba(245,158,11,0.05); top: 40%; right: 20%; animation-delay: -2s; }
+  @keyframes orbFloat {
+    0%, 100% { transform: translateY(0) scale(1); }
+    50% { transform: translateY(-30px) scale(1.05); }
+  }
+
+  /* Nav */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 20px 60px;
+    background: rgba(10,14,26,0.7);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+  }
+  .nav-logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.4rem; font-weight: 700;
+    color: var(--accent);
+    letter-spacing: -0.02em;
+  }
+  .nav-links { display: flex; gap: 40px; list-style: none; }
+  .nav-links a {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.75rem; color: var(--text-muted);
+    text-decoration: none; letter-spacing: 0.1em; text-transform: uppercase;
+    transition: color 0.3s;
+    position: relative;
+  }
+  .nav-links a::after {
+    content: ''; position: absolute; bottom: -4px; left: 0;
+    width: 0; height: 1px; background: var(--accent);
+    transition: width 0.3s;
+  }
+  .nav-links a:hover { color: var(--accent); }
+  .nav-links a:hover::after { width: 100%; }
+
+  /* Main wrapper */
+  main { position: relative; z-index: 10; }
+
+  /* Section base */
+  section { padding: 120px 60px; max-width: 1200px; margin: 0 auto; }
+
+  /* ── HERO ── */
+  #hero {
+    min-height: 100vh; display: flex; align-items: center;
+    padding-top: 160px; padding-bottom: 80px;
+    max-width: 100%; position: relative;
+  }
+  .hero-inner {
+    max-width: 1200px; margin: 0 auto;
+    padding: 0 60px;
+    display: grid; grid-template-columns: 1fr 380px; gap: 80px; align-items: center;
+  }
+  .hero-tag {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-family: 'DM Mono', monospace; font-size: 0.7rem;
+    color: var(--accent); text-transform: uppercase; letter-spacing: 0.15em;
+    border: 1px solid rgba(0,212,255,0.3); padding: 8px 16px; border-radius: 100px;
+    margin-bottom: 32px;
+    animation: fadeUp 0.8s ease both;
+  }
+  .hero-tag::before {
+    content: ''; width: 6px; height: 6px; background: var(--accent);
+    border-radius: 50%; animation: pulse 2s infinite;
+  }
+  @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(0.8)} }
+
+  h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(3.5rem, 7vw, 6rem);
+    font-weight: 900; line-height: 1.05;
+    letter-spacing: -0.03em;
+    animation: fadeUp 0.8s 0.1s ease both;
+  }
+  h1 em {
+    font-style: normal;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .hero-desc {
+    margin-top: 28px;
+    font-size: 1.1rem; line-height: 1.7; color: var(--text-muted);
+    max-width: 560px;
+    animation: fadeUp 0.8s 0.2s ease both;
+  }
+  .hero-ctas {
+    display: flex; gap: 16px; margin-top: 44px; flex-wrap: wrap;
+    animation: fadeUp 0.8s 0.3s ease both;
+  }
+  .btn-primary {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: linear-gradient(135deg, var(--accent), #0099bb);
+    color: #0a0e1a; padding: 14px 32px; border-radius: 8px;
+    font-weight: 600; font-size: 0.9rem; text-decoration: none;
+    transition: transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 0 30px rgba(0,212,255,0.3);
+  }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 0 50px rgba(0,212,255,0.4); }
+  .btn-secondary {
+    display: inline-flex; align-items: center; gap: 8px;
+    border: 1px solid var(--border); color: var(--text);
+    padding: 14px 32px; border-radius: 8px;
+    font-size: 0.9rem; text-decoration: none;
+    transition: border-color 0.2s, background 0.2s;
+    background: rgba(255,255,255,0.03);
+  }
+  .btn-secondary:hover { border-color: var(--accent); background: rgba(0,212,255,0.05); }
+
+  .hero-stats {
+    display: flex; gap: 40px; margin-top: 60px;
+    animation: fadeUp 0.8s 0.4s ease both;
+  }
+  .stat-val {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.5rem; font-weight: 700; color: var(--accent);
+    line-height: 1;
+  }
+  .stat-label { font-size: 0.78rem; color: var(--text-muted); margin-top: 4px; letter-spacing: 0.05em; }
+
+  /* Profile card */
+  .profile-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 24px; padding: 40px;
+    text-align: center;
+    box-shadow: var(--glow);
+    animation: fadeUp 0.8s 0.2s ease both;
+    position: relative; overflow: hidden;
+  }
+  .profile-card::before {
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(135deg, rgba(0,212,255,0.05), transparent 60%);
+    pointer-events: none;
+  }
+  .profile-img-wrap {
+    width: 140px; height: 140px; margin: 0 auto 20px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    padding: 3px;
+    position: relative;
+  }
+  .profile-img-wrap::after {
+    content: ''; position: absolute; inset: -8px;
+    border-radius: 50%;
+    border: 1px solid rgba(0,212,255,0.2);
+    animation: spin 8s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .profile-img-inner {
+    width: 100%; height: 100%; border-radius: 50%;
+    background: var(--surface2);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Playfair Display', serif;
+    font-size: 3rem; font-weight: 700;
+    color: var(--accent);
+    overflow: hidden;
+  }
+  .profile-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.4rem; font-weight: 700; margin-bottom: 6px;
+  }
+  .profile-role {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.72rem; color: var(--accent);
+    text-transform: uppercase; letter-spacing: 0.1em;
+  }
+  .profile-divider {
+    width: 40px; height: 2px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    margin: 20px auto;
+  }
+  .profile-contact { display: flex; flex-direction: column; gap: 10px; }
+  .contact-item {
+    display: flex; align-items: center; gap: 10px;
+    font-size: 0.82rem; color: var(--text-muted);
+    padding: 8px 12px; border-radius: 8px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--border);
+    text-align: left;
+  }
+  .contact-icon { color: var(--accent); font-size: 0.9rem; }
+
+  @keyframes fadeUp {
+    from { opacity:0; transform: translateY(30px); }
+    to   { opacity:1; transform: translateY(0); }
+  }
+
+  /* ── SECTION HEADERS ── */
+  .section-header { margin-bottom: 64px; }
+  .section-tag {
+    font-family: 'DM Mono', monospace; font-size: 0.7rem;
+    color: var(--accent); text-transform: uppercase; letter-spacing: 0.15em;
+    display: flex; align-items: center; gap: 12px; margin-bottom: 16px;
+  }
+  .section-tag::before {
+    content: ''; display: block; width: 24px; height: 1px; background: var(--accent);
+  }
+  .section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2rem, 4vw, 3rem); font-weight: 700;
+    letter-spacing: -0.02em; line-height: 1.1;
+  }
+
+  /* ── EXPERIENCE ── */
+  #experience { background: rgba(17,24,39,0.5); }
+  .exp-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px; padding: 48px;
+    position: relative; overflow: hidden;
+    transition: border-color 0.3s, box-shadow 0.3s;
+  }
+  .exp-card:hover { border-color: rgba(0,212,255,0.3); box-shadow: var(--glow); }
+  .exp-card::before {
+    content: ''; position: absolute; left: 0; top: 0; bottom: 0;
+    width: 4px;
+    background: linear-gradient(to bottom, var(--accent), var(--accent2));
+  }
+  .exp-header { display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 16px; margin-bottom: 32px; }
+  .exp-company {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.8rem; font-weight: 700;
+  }
+  .exp-role {
+    font-family: 'DM Mono', monospace; font-size: 0.75rem;
+    color: var(--accent); text-transform: uppercase;
+    letter-spacing: 0.1em; margin-top: 4px;
+  }
+  .exp-badge {
+    background: rgba(0,212,255,0.1); border: 1px solid rgba(0,212,255,0.2);
+    color: var(--accent); padding: 8px 20px; border-radius: 100px;
+    font-family: 'DM Mono', monospace; font-size: 0.72rem;
+    letter-spacing: 0.05em; white-space: nowrap;
+  }
+  .exp-desc { color: var(--text-muted); line-height: 1.8; margin-bottom: 32px; }
+  .exp-tags { display: flex; flex-wrap: wrap; gap: 10px; }
+  .exp-tag {
+    background: rgba(124,58,237,0.1); border: 1px solid rgba(124,58,237,0.2);
+    color: #a78bfa; padding: 6px 14px; border-radius: 6px;
+    font-size: 0.8rem; font-family: 'DM Mono', monospace;
+    transition: background 0.2s;
+  }
+  .exp-tag:hover { background: rgba(124,58,237,0.2); }
+
+  /* ── SKILLS ── */
+  .skills-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 24px; }
+  .skill-card {
+    background: var(--surface);
+    border: 1px solid var(--border); border-radius: 16px;
+    padding: 32px;
+    transition: transform 0.3s, border-color 0.3s, box-shadow 0.3s;
+    cursor: default; position: relative; overflow: hidden;
+  }
+  .skill-card::after {
+    content: ''; position: absolute; inset: 0;
+    background: radial-gradient(circle at 80% 20%, rgba(0,212,255,0.06), transparent 60%);
+    opacity: 0; transition: opacity 0.3s;
+  }
+  .skill-card:hover { transform: translateY(-6px); border-color: rgba(0,212,255,0.3); box-shadow: var(--glow); }
+  .skill-card:hover::after { opacity: 1; }
+  .skill-icon {
+    width: 48px; height: 48px; border-radius: 12px;
+    background: linear-gradient(135deg, rgba(0,212,255,0.15), rgba(124,58,237,0.15));
+    border: 1px solid rgba(0,212,255,0.2);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.4rem; margin-bottom: 20px;
+  }
+  .skill-name {
+    font-size: 1.05rem; font-weight: 600; margin-bottom: 8px;
+  }
+  .skill-desc { font-size: 0.83rem; color: var(--text-muted); line-height: 1.6; }
+  .skill-bar-wrap { margin-top: 20px; }
+  .skill-bar-label {
+    display: flex; justify-content: space-between;
+    font-family: 'DM Mono', monospace; font-size: 0.7rem;
+    color: var(--text-muted); margin-bottom: 8px;
+  }
+  .skill-bar {
+    height: 4px; background: rgba(255,255,255,0.06); border-radius: 2px; overflow: hidden;
+  }
+  .skill-bar-fill {
+    height: 100%; border-radius: 2px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    transform: scaleX(0); transform-origin: left;
+    transition: transform 1s ease 0.3s;
+  }
+  .skill-card.visible .skill-bar-fill { transform: scaleX(1); }
+
+  /* ── CERTIFICATIONS ── */
+  #certifications { background: rgba(17,24,39,0.5); }
+  .certs-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 28px; }
+  .cert-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 20px; padding: 36px;
+    position: relative; overflow: hidden;
+    transition: transform 0.3s, border-color 0.3s, box-shadow 0.3s;
+  }
+  .cert-card:hover { transform: translateY(-4px); border-color: rgba(245,158,11,0.4); box-shadow: 0 0 40px rgba(245,158,11,0.1); }
+  .cert-card::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+    background: linear-gradient(90deg, var(--accent3), #f97316);
+  }
+  .cert-badge {
+    width: 56px; height: 56px; border-radius: 14px; margin-bottom: 24px;
+    background: linear-gradient(135deg, rgba(245,158,11,0.15), rgba(249,115,22,0.1));
+    border: 1px solid rgba(245,158,11,0.2);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.6rem;
+  }
+  .cert-title { font-size: 1rem; font-weight: 600; margin-bottom: 8px; line-height: 1.4; }
+  .cert-code {
+    font-family: 'DM Mono', monospace; font-size: 0.72rem;
+    color: var(--accent3); letter-spacing: 0.05em;
+  }
+
+  /* ── EDUCATION ── */
+  .edu-timeline { display: flex; flex-direction: column; gap: 0; position: relative; }
+  .edu-timeline::before {
+    content: ''; position: absolute; left: 20px; top: 0; bottom: 0;
+    width: 1px; background: linear-gradient(to bottom, var(--accent), var(--accent2), transparent);
+  }
+  .edu-item { display: flex; gap: 40px; padding-bottom: 48px; position: relative; }
+  .edu-dot {
+    width: 40px; height: 40px; flex-shrink: 0;
+    border-radius: 50%; background: var(--surface);
+    border: 2px solid var(--accent);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1rem; position: relative; z-index: 1;
+    box-shadow: 0 0 20px rgba(0,212,255,0.3);
+  }
+  .edu-content {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 16px; padding: 28px 32px; flex: 1;
+    transition: border-color 0.3s;
+  }
+  .edu-content:hover { border-color: rgba(0,212,255,0.3); }
+  .edu-degree {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.2rem; font-weight: 700; margin-bottom: 6px;
+  }
+  .edu-school { color: var(--accent); font-size: 0.9rem; font-weight: 500; margin-bottom: 4px; }
+  .edu-meta {
+    font-family: 'DM Mono', monospace; font-size: 0.72rem;
+    color: var(--text-muted); letter-spacing: 0.05em;
+  }
+
+  /* ── FOOTER ── */
+  footer {
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    padding: 60px;
+    text-align: center;
+    position: relative; z-index: 10;
+  }
+  .footer-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 2rem; font-weight: 700;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    margin-bottom: 12px;
+  }
+  .footer-sub { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 32px; }
+  .footer-contact {
+    display: flex; justify-content: center; gap: 24px; flex-wrap: wrap;
+    margin-bottom: 40px;
+  }
+  .footer-link {
+    display: flex; align-items: center; gap: 8px;
+    color: var(--text-muted); text-decoration: none; font-size: 0.87rem;
+    transition: color 0.2s;
+  }
+  .footer-link:hover { color: var(--accent); }
+  .footer-copy {
+    font-family: 'DM Mono', monospace; font-size: 0.7rem;
+    color: rgba(148,163,184,0.4); letter-spacing: 0.05em;
+  }
+
+  /* Scroll indicator */
+  .scroll-line {
+    position: fixed; top: 0; left: 0; height: 3px; z-index: 200;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    width: 0%; transition: width 0.1s;
+  }
+
+  /* Intersection-observer fade-in */
+  .reveal {
+    opacity: 0; transform: translateY(40px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+  .reveal-delay-1 { transition-delay: 0.1s; }
+  .reveal-delay-2 { transition-delay: 0.2s; }
+  .reveal-delay-3 { transition-delay: 0.3s; }
+
+  @media (max-width: 900px) {
+    nav { padding: 16px 24px; }
+    .nav-links { gap: 20px; }
+    .hero-inner { grid-template-columns: 1fr; padding: 0 24px; }
+    .profile-card { display: none; }
+    section { padding: 80px 24px; }
+    .hero-stats { gap: 24px; }
+    footer { padding: 40px 24px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+<div class="scroll-line" id="scrollLine"></div>
+<div class="grid-bg"></div>
+<div class="orb orb1"></div>
+<div class="orb orb2"></div>
+<div class="orb orb3"></div>
+
+<nav>
+  <div class="nav-logo">GK.</div>
+  <ul class="nav-links">
+    <li><a href="#experience">Experience</a></li>
+    <li><a href="#skills">Skills</a></li>
+    <li><a href="#certifications">Certs</a></li>
+    <li><a href="#education">Education</a></li>
+    <li><a href="mailto:gokulakrishnan2116@gmail.com">Contact</a></li>
+  </ul>
+</nav>
+
+<main>
+  <!-- HERO -->
+  <section id="hero" style="padding:0">
+    <div class="hero-inner">
+      <div>
+        <div class="hero-tag">Available for Opportunities</div>
+        <h1>
+          Gokulakrishnan<br>
+          <em>R.</em>
+        </h1>
+        <p class="hero-desc">
+          SAP EWM Consultant with 2.5 years of experience architecting end-to-end warehouse management solutions in S/4HANA 2023. Specializing in inbound, outbound, and internal warehouse operations — on-prem and cloud.
+        </p>
+        <div class="hero-ctas">
+          <a href="mailto:gokulakrishnan2116@gmail.com" class="btn-primary">
+            ✉ Get in Touch
+          </a>
+          <a href="tel:8248639433" class="btn-secondary">
+            ☎ 824-863-9433
+          </a>
+        </div>
+        <div class="hero-stats">
+          <div>
+            <div class="stat-val">2.5+</div>
+            <div class="stat-label">Years Experience</div>
+          </div>
+          <div>
+            <div class="stat-val">30+</div>
+            <div class="stat-label">Processes Optimized</div>
+          </div>
+          <div>
+            <div class="stat-val">2</div>
+            <div class="stat-label">SAP Certifications</div>
+          </div>
+        </div>
+      </div>
+      <div class="profile-card">
+        <div class="profile-img-wrap">
+          <div class="profile-img-inner">GK</div>
+        </div>
+        <div class="profile-name">Gokulakrishnan R</div>
+        <div class="profile-role">EWM Consultant</div>
+        <div class="profile-divider"></div>
+        <div class="profile-contact">
+          <div class="contact-item">
+            <span class="contact-icon">📍</span>
+            Chennai, India 600092
+          </div>
+          <div class="contact-item">
+            <span class="contact-icon">📞</span>
+            8248639433
+          </div>
+          <div class="contact-item">
+            <span class="contact-icon">✉</span>
+            gokulakrishnan2116@gmail.com
+          </div>
+          <div class="contact-item">
+            <span class="contact-icon">🏢</span>
+            Accenture
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- EXPERIENCE -->
+  <div id="experience" style="background: rgba(17,24,39,0.5);">
+  <section style="max-width:1200px; margin:0 auto;">
+    <div class="section-header reveal">
+      <div class="section-tag">Career</div>
+      <h2 class="section-title">Work Experience</h2>
+    </div>
+    <div class="exp-card reveal reveal-delay-1">
+      <div class="exp-header">
+        <div>
+          <div class="exp-company">Accenture</div>
+          <div class="exp-role">SAP EWM Consultant</div>
+        </div>
+        <div class="exp-badge">~2 Years</div>
+      </div>
+      <p class="exp-desc">
+        Specializing in designing, configuring, and supporting warehouse management solutions on S/4HANA 2023. Proficient in setting up warehouse structures and handling end-to-end inbound and outbound processes including goods receipt, putaway, picking, packing, and shipping.
+        <br><br>
+        Experienced in production integration scenarios such as Engineer-to-Order (ETO), Returnable Transport Packaging (RTP), and Project stock management. Worked extensively on customer-owned stock and customer-supplied parts scenarios, along with internal warehouse movements like replenishment and stock transfers.
+        <br><br>
+        Strong exposure to advanced EWM functionalities including POSC, LOSC, and RF framework. Hands-on experience in kitting and ASR (Advance Shipping and Receiving) scenarios. Conducted comprehensive cross-module testing across SAP MM, TM, QM, PS, and PP.
+      </p>
+      <div class="exp-tags">
+        <span class="exp-tag">SAP EWM</span>
+        <span class="exp-tag">S/4HANA 2023</span>
+        <span class="exp-tag">Inbound Processes</span>
+        <span class="exp-tag">Outbound Processes</span>
+        <span class="exp-tag">Engineer-to-Order</span>
+        <span class="exp-tag">RTP</span>
+        <span class="exp-tag">POSC / LOSC</span>
+        <span class="exp-tag">RF Framework</span>
+        <span class="exp-tag">Kitting</span>
+        <span class="exp-tag">ASR</span>
+        <span class="exp-tag">SAP MM</span>
+        <span class="exp-tag">SAP TM</span>
+        <span class="exp-tag">SAP QM</span>
+        <span class="exp-tag">SAP PP</span>
+        <span class="exp-tag">SAP PS</span>
+        <span class="exp-tag">Cloud & On-Prem</span>
+      </div>
+    </div>
+  </section>
+  </div>
+
+  <!-- SKILLS -->
+  <section id="skills">
+    <div class="section-header reveal">
+      <div class="section-tag">Expertise</div>
+      <h2 class="section-title">Core Skills</h2>
+    </div>
+    <div class="skills-grid">
+      <div class="skill-card reveal reveal-delay-1">
+        <div class="skill-icon">🏭</div>
+        <div class="skill-name">SAP EWM</div>
+        <div class="skill-desc">Extended Warehouse Management — configuring warehouse structures, processes, and advanced functionalities including POSC, LOSC, and RF framework.</div>
+        <div class="skill-bar-wrap">
+          <div class="skill-bar-label"><span>Proficiency</span><span>Expert</span></div>
+          <div class="skill-bar"><div class="skill-bar-fill" style="--w:0.92"></div></div>
+        </div>
+      </div>
+      <div class="skill-card reveal reveal-delay-2">
+        <div class="skill-icon">📦</div>
+        <div class="skill-name">SAP MM</div>
+        <div class="skill-desc">Materials Management — cross-module testing, integration support, procurement and inventory management processes.</div>
+        <div class="skill-bar-wrap">
+          <div class="skill-bar-label"><span>Proficiency</span><span>Advanced</span></div>
+          <div class="skill-bar"><div class="skill-bar-fill" style="--w:0.80"></div></div>
+        </div>
+      </div>
+      <div class="skill-card reveal reveal-delay-3">
+        <div class="skill-icon">🔄</div>
+        <div class="skill-name">Inbound & Outbound</div>
+        <div class="skill-desc">End-to-end warehouse flows — goods receipt, putaway, picking, packing, shipping, and replenishment strategies.</div>
+        <div class="skill-bar-wrap">
+          <div class="skill-bar-label"><span>Proficiency</span><span>Expert</span></div>
+          <div class="skill-bar"><div class="skill-bar-fill" style="--w:0.90"></div></div>
+        </div>
+      </div>
+      <div class="skill-card reveal reveal-delay-1">
+        <div class="skill-icon">⚙️</div>
+        <div class="skill-name">Production Integration</div>
+        <div class="skill-desc">ETO, RTP, project stock management, kitting, and customer-owned stock scenarios in integrated manufacturing environments.</div>
+        <div class="skill-bar-wrap">
+          <div class="skill-bar-label"><span>Proficiency</span><span>Advanced</span></div>
+          <div class="skill-bar"><div class="skill-bar-fill" style="--w:0.82"></div></div>
+        </div>
+      </div>
+      <div class="skill-card reveal reveal-delay-2">
+        <div class="skill-icon">☁️</div>
+        <div class="skill-name">Cloud & On-Prem</div>
+        <div class="skill-desc">Hands-on experience deploying and supporting SAP solutions in both private cloud and on-premise S/4HANA environments.</div>
+        <div class="skill-bar-wrap">
+          <div class="skill-bar-label"><span>Proficiency</span><span>Proficient</span></div>
+          <div class="skill-bar"><div class="skill-bar-fill" style="--w:0.78"></div></div>
+        </div>
+      </div>
+      <div class="skill-card reveal reveal-delay-3">
+        <div class="skill-icon">🔬</div>
+        <div class="skill-name">Cross-Module Testing</div>
+        <div class="skill-desc">Comprehensive integration testing across SAP MM, TM, QM, PS, and PP modules for warehouse operations.</div>
+        <div class="skill-bar-wrap">
+          <div class="skill-bar-label"><span>Proficiency</span><span>Advanced</span></div>
+          <div class="skill-bar"><div class="skill-bar-fill" style="--w:0.85"></div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CERTIFICATIONS -->
+  <div id="certifications" style="background: rgba(17,24,39,0.5);">
+  <section style="max-width:1200px; margin:0 auto;">
+    <div class="section-header reveal">
+      <div class="section-tag">Credentials</div>
+      <h2 class="section-title">Certifications</h2>
+    </div>
+    <div class="certs-grid">
+      <div class="cert-card reveal reveal-delay-1">
+        <div class="cert-badge">🏅</div>
+        <div class="cert-title">SAP Private Cloud in Supply Chain</div>
+        <div class="cert-code">C_S4EWM_2023</div>
+      </div>
+      <div class="cert-card reveal reveal-delay-2">
+        <div class="cert-badge">☁️</div>
+        <div class="cert-title">SAP Public Cloud — Implementation Consultant, Sourcing & Procurement</div>
+        <div class="cert-code">C_S4CPR_2502</div>
+      </div>
+    </div>
+  </section>
+  </div>
+
+  <!-- EDUCATION -->
+  <section id="education">
+    <div class="section-header reveal">
+      <div class="section-tag">Background</div>
+      <h2 class="section-title">Education</h2>
+    </div>
+    <div class="edu-timeline">
+      <div class="edu-item reveal reveal-delay-1">
+        <div class="edu-dot">🎓</div>
+        <div class="edu-content">
+          <div class="edu-degree">Master of Computer Applications</div>
+          <div class="edu-school">PSG College of Technology</div>
+          <div class="edu-meta">Coimbatore, Tamil Nadu &nbsp;·&nbsp; Graduated June 2023</div>
+        </div>
+      </div>
+      <div class="edu-item reveal reveal-delay-2">
+        <div class="edu-dot">📚</div>
+        <div class="edu-content">
+          <div class="edu-degree">Bachelor of Computer Applications</div>
+          <div class="edu-school">SRM Arts and Science College</div>
+          <div class="edu-meta">Chennai, Tamil Nadu &nbsp;·&nbsp; Graduated June 2021</div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="footer-name">Gokulakrishnan R.</div>
+  <div class="footer-sub">SAP EWM Consultant · Chennai, India</div>
+  <div class="footer-contact">
+    <a href="mailto:gokulakrishnan2116@gmail.com" class="footer-link">
+      ✉ gokulakrishnan2116@gmail.com
+    </a>
+    <a href="tel:8248639433" class="footer-link">
+      ☎ 8248639433
+    </a>
+    <span class="footer-link">📍 Chennai, India 600092</span>
+  </div>
+  <div class="footer-copy">© 2025 Gokulakrishnan R · Built with precision</div>
+</footer>
+
+<script>
+  // Custom cursor
+  const cursor = document.getElementById('cursor');
+  const ring = document.getElementById('cursorRing');
+  let mx = 0, my = 0, rx = 0, ry = 0;
+  document.addEventListener('mousemove', e => {
+    mx = e.clientX; my = e.clientY;
+    cursor.style.left = mx + 'px'; cursor.style.top = my + 'px';
+  });
+  function animateRing() {
+    rx += (mx - rx) * 0.12; ry += (my - ry) * 0.12;
+    ring.style.left = rx + 'px'; ring.style.top = ry + 'px';
+    requestAnimationFrame(animateRing);
+  }
+  animateRing();
+  document.querySelectorAll('a, button, .skill-card, .cert-card').forEach(el => {
+    el.addEventListener('mouseenter', () => {
+      cursor.style.width = '20px'; cursor.style.height = '20px';
+      ring.style.width = '60px'; ring.style.height = '60px';
+      ring.style.borderColor = 'rgba(0,212,255,0.6)';
+    });
+    el.addEventListener('mouseleave', () => {
+      cursor.style.width = '12px'; cursor.style.height = '12px';
+      ring.style.width = '40px'; ring.style.height = '40px';
+      ring.style.borderColor = 'rgba(0,212,255,0.4)';
+    });
+  });
+
+  // Scroll progress
+  const scrollLine = document.getElementById('scrollLine');
+  window.addEventListener('scroll', () => {
+    const pct = (window.scrollY / (document.body.scrollHeight - window.innerHeight)) * 100;
+    scrollLine.style.width = pct + '%';
+  });
+
+  // Intersection Observer for reveals
+  const revealEls = document.querySelectorAll('.reveal, .skill-card');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('visible');
+        observer.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.12 });
+  revealEls.forEach(el => observer.observe(el));
+
+  // Skill bar widths
+  document.querySelectorAll('.skill-bar-fill').forEach(bar => {
+    const w = bar.style.getPropertyValue('--w');
+    bar.style.setProperty('--scale', w);
+    bar.style.transform = 'scaleX(0)';
+  });
+  const skillObserver = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        const fill = e.target.querySelector('.skill-bar-fill');
+        if (fill) {
+          const w = fill.style.getPropertyValue('--w') || '0.8';
+          fill.style.transform = `scaleX(${w})`;
+        }
+      }
+    });
+  }, { threshold: 0.3 });
+  document.querySelectorAll('.skill-card').forEach(c => skillObserver.observe(c));
+</script>
+</body>
+</html>
